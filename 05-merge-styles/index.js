@@ -8,7 +8,7 @@ fs.readdir(folderPath, {withFileTypes: true}, function (error, styles) {
       return console.error(error.message);
     }
     styles.forEach((style) => {
-      if (style.isFile() && path.extname(path.join(folderPath, style.name)) === '.css') {
+      if (style.isFile() && path.extname(style.name) === '.css') {
         const inputPath = fs.createReadStream(path.join(folderPath, style.name), 'utf-8');
         inputPath.pipe(bundlePath, { end: false });
       }
