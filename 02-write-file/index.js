@@ -10,7 +10,7 @@ fs.writeFile(path.join(__dirname, 'answer.txt'), '', (error) => {
       output: process.stdout
     });
     
-    process.stdout.write('What is your favourite book?');
+    process.stdout.write('Tell about your favourite book, please?');
     readline.on('line', (answer) => {
       if (answer === 'exit') {
         readline.close();
@@ -20,6 +20,6 @@ fs.writeFile(path.join(__dirname, 'answer.txt'), '', (error) => {
         });
       }
     });
-    readline.on('close', () => process.stdout.write('Have a nice day!'));
+    readline.on('close', () => process.stdout.write('Thank you! Have a nice day!'));
   }
 });
