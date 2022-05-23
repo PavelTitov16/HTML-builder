@@ -27,9 +27,7 @@ async function сreatePage() {
             }
         }
         projectFile.write(templateData);
-    }
-    
-    catch (error) {
+    } catch (error) {
         return console.error(error.message);
     }
 };
@@ -37,15 +35,11 @@ async function сreatePage() {
 async function mergeStyles() {
     const bundlePath = fs.createWriteStream(path.join(__dirname, 'project-dist', 'style.css'));
     try {
-        const styles = await readdir(folderPath, {
-            withFileTypes: true
-        });
+        const styles = await readdir(folderPath, {withFileTypes: true});
         styles.forEach((style) => {
             if (style.isFile() && path.extname(style.name) === '.css') {
                 const inputPath = fs.createReadStream(path.join(folderPath, style.name), 'utf-8');
-                inputPath.pipe(bundlePath, {
-                    end: false
-                });
+                inputPath.pipe(bundlePath, {end: false});
             }
         });
     } catch (error) {
@@ -54,21 +48,22 @@ async function mergeStyles() {
 };
 
 async function copyAssets(from, to) {
-    const files = await readdir(from, {withFileTypes: true});
+    const files = await readdir(from, {
+        withFileTypes: true
+    });
     const nameFolder = path.basename(from);
     const copyDirectory = path.join(to, nameFolder);
     await mkdir(copyDirectory);
     try {
-    files.forEach((file) => {
-        if (file.isFile()) {
-            copyFile(path.join(from, file.name), path.join(copyDirectory, file.name));
-        } else {
-            copyAssets(path.join(from, file.name), copyDirectory);
-        }
-    });
-    }
-    catch (error) {
-    return console.error(error.message);
+        files.forEach((file) => {
+            if (file.isFile()) {
+                copyFile(path.join(from, file.name), path.join(copyDirectory, file.name));
+            } else {
+                copyAssets(path.join(from, file.name), copyDirectory);
+            }
+        });
+    } catch (error) {
+        return console.error(error.message);
     }
 }
 
@@ -76,42 +71,26 @@ async function сopyFolder() {
     const assetsPath = path.join(__dirname, 'assets');
     const copyPath = path.join(__dirname, 'project-dist');
     try {
-        await access(copyPath, {
-            recursive: true
-        });
-        await rm(copyPath, {
-            recursive: true
-        });
-        await mkdir(copyPath, {
-            recursive: true
-        });
+        await access(copyPath);
+        await rm(copyPath, {recursive: true});
+        await mkdir(copyPath, {recursive: true});
         copyAssets(assetsPath, copyPath);
     } catch (error) {
-        await mkdir(copyPath, {
-            recursive: true
-        });
+        await mkdir(copyPath, {recursive: true});
         copyAssets(assetsPath, copyPath);
     };
 }
 
 (async function createDirectoty(data) {
     try {
-        await access(data, {
-            recursive: true
-        });
-        await rm(data, {
-            recursive: true
-        });
-        await mkdir(data, {
-            recursive: true
-        });
+        await access(data, {recursive: true});
+        await rm(data, {recursive: true});
+        await mkdir(data, {recursive: true});
         сreatePage();
         mergeStyles();
         сopyFolder();
     } catch (error) {
-        await mkdir(data, {
-            recursive: true
-        });
+        await mkdir(data, {recursive: true});
         сreatePage();
         mergeStyles();
         сopyFolder();
