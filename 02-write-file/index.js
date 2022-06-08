@@ -1,7 +1,8 @@
 const fs = require('fs');
 const path = require('path');
+const pathToFile = path.join(__dirname, 'answer.txt');
 
-fs.writeFile(path.join(__dirname, 'answer.txt'), '', (error) => {
+fs.writeFile(pathToFile, '', (error) => {
     if (error) {
       return console.log(error.message);
     } else {
@@ -15,7 +16,7 @@ fs.writeFile(path.join(__dirname, 'answer.txt'), '', (error) => {
       if (answer === 'exit') {
         readline.close();
       } else {
-      fs.appendFile(path.join(__dirname, 'answer.txt'), `${answer}\n`, (error) => {
+      fs.appendFile(pathToFile, `${answer}\n`, (error) => {
           if (error) return console.error(error.message);
         });
       }
