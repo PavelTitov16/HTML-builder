@@ -1,13 +1,14 @@
 const fs = require('fs');
-
 const path = require('path');
+const folderPath = path.join(__dirname, 'secret-folder');
 
-fs.readdir(path.join(__dirname, 'secret-folder'), function (err, files) {
+fs.readdir(folderPath, function (err, files) {
     if (err) {
         return console.error(err.message);
     }
     files.forEach((file) => {
-        const filePath = path.join(__dirname, 'secret-folder', file);
+        const filePath = path.join(folderPath, file);
+        
         fs.stat(filePath, (err, file) => {
             if (err) {
                 return console.error(err.message);
