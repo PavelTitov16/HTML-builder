@@ -1,21 +1,46 @@
-const fs = require('fs');
+const {
+    readdir,
+    stat,
+} = require('fs/promises');
 const path = require('path');
-const folderPath = path.join(__dirname, 'secret-folder');
 
-fs.readdir(folderPath, function (err, files) {
-    if (err) {
-        return console.error(err.message);
-    }
-    files.forEach((file) => {
-        const filePath = path.join(folderPath, file);
-        
-        fs.stat(filePath, (err, file) => {
-            if (err) {
-                return console.error(err.message);
+const getBaseName = (filePath, ext) => {
+    return path.basename(filePath, ext);
+}
+
+const getExtension = (filePath) => {
+    const extension = path.extname(filePath);
+    return extension.slice(1);
+}
+
+const getSize = (itemStats) => {
+    return itemStats.size;
+}
+
+const readFolder = async () => {
+    const folderPath = path.join(__dirname, 'secret-folder');
+
+    try {
+        const content = await readdir(folderPath);
+
+        content.forEach(async (item) => {
+            const filePath = path.join(folderPath, item);
+            const itemStats = await stat(filePath);
+
+            if (itemStats.isFile()) {
+                const ext = path.extname(filePath);
+                const basename = getBaseName(filePath, ext);
+                const extension = getExtension(filePath);
+                const fileSize = getSize(itemStats);
+                const output = `${basename} - ${extension} - ${fileSize / 1024}kb`;
+                console.log(output);
             }
-            if (file.isFile()) {
-                console.log(`${path.parse(filePath).name} - ${path.extname(filePath).slice(1)} - ${file.size / 1024}kb`)
-            }
+            
         });
-    });
-});
+
+    } catch (error) {
+        return console.error(error.message);
+    }
+}
+
+readFolder();
