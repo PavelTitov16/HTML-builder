@@ -3,12 +3,14 @@ const {
     access,
     readdir,
     readFile,
-    /*copyFile,*/
+    copyFile,
     mkdir,
     rm,
 } = require('fs/promises');
 const path = require('path');
 const folderPath = path.join(__dirname, 'styles');
+const assetsPath = path.join(__dirname, 'assets');
+const copyPath = path.join(__dirname, 'project-dist', 'assets');
 
 async function сreatePage() {
     try {
@@ -47,67 +49,21 @@ async function mergeStyles() {
     }
 };
 
-// Необходимо переписать позже, потому пока оставляю матрешку
-/*async function copyAssets(from, to) {
+async function copyAssets(from, to) {
+    await rm(to, {force: true, recursive: true});
+    await mkdir(to, {recursive: true});
     const files = await readdir(from, {withFileTypes: true});
-    const nameFolder = path.basename(from);
-    const copyDirectory = path.join(to, nameFolder);
-    await mkdir(path.join(to));
     try {
-        files.forEach((file) => {
+        for (let file of files) {
             if (file.isFile()) {
                 copyFile(path.join(from, file.name), path.join(to, file.name));
             } else {
-                copyAssets(path.join(from, file.name), to);
+              await copyAssets(path.join(from, file.name), path.join(to, file.name));
             }
-        });
+        };
     } catch (error) {
         return console.error(error.message);
     }
-}
-
-async function сopyFolder() {
-    const assetsPath = path.join(__dirname, 'assets');
-    const copyPath = path.join(__dirname, 'project-dist', 'assets');
-    try {
-        await access(copyPath, {recursive: true});
-        await rm(copyPath, {recursive: true});
-        await mkdir(copyPath, {recursive: true});
-        copyAssets(assetsPath, copyPath);
-    } catch (error) {
-        await mkdir(copyPath, {recursive: true});
-        copyAssets(assetsPath, copyPath);
-    };
-}*/
-
-function copyFolder(from, to) {
-    fs.rm(to, {force: true, recursive: true }, (error) => {
-      if (error) {
-        return console.error(error.message);
-      } 
-      fs.mkdir(to, {recursive: true}, (error) => {
-        if (error) {
-          return console.error(error.message);
-        } else {
-          fs.readdir(from, {withFileTypes: true}, function (error, files) {
-            if (error) {
-              return console.error(error.message);
-            }
-            files.forEach((file) => {
-              if (file.isFile()) {
-                fs.copyFile(path.join(from, file.name), path.join(to, file.name), (error) => {
-                  if (error) {
-                    return console.error(error.message);
-                  }
-                });
-              } else {
-                copyFolder(path.join(from, file.name), path.join(to, file.name));
-              }
-            });
-          });
-        }
-      });
-    });
 }
 
 (async function createDirectoty(data) {
@@ -117,11 +73,11 @@ function copyFolder(from, to) {
         await mkdir(data, {recursive: true});
         сreatePage();
         mergeStyles();
-        copyFolder(path.join(__dirname, 'assets'), path.join(__dirname, 'project-dist', 'assets'));
+        await copyAssets(assetsPath, copyPath);
     } catch (error) {
         await mkdir(data, {recursive: true});
         сreatePage();
         mergeStyles();
-        copyFolder(path.join(__dirname, 'assets'), path.join(__dirname, 'project-dist', 'assets'));
+        await copyAssets(assetsPath, copyPath);
     }
 })(path.join(__dirname, 'project-dist'));
