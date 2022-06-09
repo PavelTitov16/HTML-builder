@@ -21,8 +21,10 @@ async function сreatePage() {
         const projectFile = fs.createWriteStream(path.join(__dirname, 'project-dist', 'index.html'), 'utf-8');
 
         for (let component of components) {
+            const documentName = '.html';
             let currentComponent = path.parse(path.join(componentPath, component.name));
-            if (component.isFile() && path.extname(component.name) === '.html') {
+            
+            if (component.isFile() && path.extname(component.name) === documentName) {
                 const componentFragment = await readFile(path.join(componentPath, component.name), 'utf-8');
 
                 templateData = templateData.replace(new RegExp(`{{${currentComponent.name}}}`, 'g'), componentFragment);
@@ -38,8 +40,11 @@ async function mergeStyles() {
     const bundlePath = fs.createWriteStream(path.join(__dirname, 'project-dist', 'style.css'));
     try {
         const styles = await readdir(folderPath, {withFileTypes: true});
+
         styles.forEach((style) => {
-            if (style.isFile() && path.extname(style.name) === '.css') {
+            const styleName = '.css';
+
+            if (style.isFile() && path.extname(style.name) === styleName) {
                 const inputPath = fs.createReadStream(path.join(folderPath, style.name), 'utf-8');
                 inputPath.pipe(bundlePath, {end: false});
             }
@@ -55,10 +60,13 @@ async function copyAssets(from, to) {
     const files = await readdir(from, {withFileTypes: true});
     try {
         for (let file of files) {
+            const source = path.join(from, file.name);
+            const destination = path.join(to, file.name);
+
             if (file.isFile()) {
-                copyFile(path.join(from, file.name), path.join(to, file.name));
+                copyFile(source, destination);
             } else {
-              await copyAssets(path.join(from, file.name), path.join(to, file.name));
+              await copyAssets(source, destination);
             }
         };
     } catch (error) {
